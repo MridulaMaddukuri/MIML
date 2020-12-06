@@ -23,14 +23,18 @@ from deep_miml.utils import (
 )
 
 
-@timing
+# @timing
 def train_miml_model(
     model,
+    model_name, 
+    model_type,
+    use_pretrained,
     device,
     dataloaders,
     criterion,
     optimizer,
     save_folder,
+    lr = 0.001,
     num_epochs=25,
     early_stopping=True,
     patience=5,
@@ -48,7 +52,7 @@ def train_miml_model(
         for l in model.attn_layers:
             if device != "cpu":
                 l.cuda()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = optim.Adam(model.parameters(), lr=lr)
     epoch = 0
     print(device)
     while not stop_train and epoch <= num_epochs:
@@ -154,9 +158,9 @@ def train_miml_model(
                 best_avg_precision = np.mean(epoch_apk)
                 early_stop_count = 0
                 best_model_path = Path.cwd().joinpath(
-                    args.save_folder,
+                    save_folder,
                     "intermediate_{}_{}_pretrained_{}.pt".format(
-                        args.model_name, args.model_type, int(args.use_pretrained)
+                        model_name, model_type, int(use_pretrained)
                     ),
                 )
                 torch.save(model, best_model_path)
