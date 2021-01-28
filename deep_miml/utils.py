@@ -1,7 +1,9 @@
 from functools import wraps
-from time import time
-import numpy as np
 from heapq import nlargest
+from time import time
+
+import numpy as np
+
 
 def timing(f):
     @wraps(f)
@@ -12,15 +14,17 @@ def timing(f):
         # print('func:%r args:[%r, %r] took: %2.4f s\n' % (f.__name__,
         #        args, kw,
         #       te-ts))
-        print('func:%r took: %2.4f s\n' % (f.__name__, te-ts))
+        print("func:%r took: %2.4f s\n" % (f.__name__, te - ts))
         return result
-    return wrap
 
+    return wrap
 
 
 def precision_recall_helper(actual, predicted, k):
     active_actual_idxs = set([i for i, e in enumerate(actual) if e == 1])
-    predicted_top_k_indices = set([i[0] for i in nlargest(k, enumerate(predicted), key=lambda x: x[1])])
+    predicted_top_k_indices = set(
+        [i[0] for i in nlargest(k, enumerate(predicted), key=lambda x: x[1])]
+    )
     intersection = active_actual_idxs.intersection(predicted_top_k_indices)
     if len(active_actual_idxs) == 0:
         return 0, 1  # precision, recall
@@ -32,6 +36,12 @@ def precision_recall_helper(actual, predicted, k):
 def get_avg_batch_precision_recall_at_k(actual_lists, predicted_lists, k):
     assert len(actual_lists) == len(predicted_lists)
     batch_len = len(actual_lists)
-    precision = [precision_recall_helper(actual_lists[i], predicted_lists[i], k)[0] for i in range(batch_len)]
-    recall = [precision_recall_helper(actual_lists[i], predicted_lists[i], k)[1] for i in range(batch_len)]
-    return np.mean(precision), np.mean(recall)
+    precision = [
+        precision_recall_helper(actual_lists[i], predicted_lists[i], k)[0]
+        for i in range(batch_len)
+    ]
+    recall = [
+        precision_recall_helper(actual_lists[i], predicted_lists[i], k)[1]
+        for i in range(batch_len)
+    ]
+    return np.mean(precision), np.mean(recall), np.std(precision), np.std(recall)

@@ -1,32 +1,30 @@
-import os
-import numpy as np
 import json
+import os
+
+import numpy as np
 
 # https://lernapparat.de/debug-device-assert/
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
-from tqdm import tqdm
-import copy
+import argparse
+# import copy
 from pathlib import Path
-import pickle
 
 import torch
-import torchvision.transforms as transforms
 import torch.optim as optim
-import argparse
+from tqdm import tqdm
 
-from deep_miml.cifar_bags import get_train_val_split_data, MIMLBagsData, collate_fn
-from deep_miml.models import Average, Attention
+from deep_miml.cifar_bags import collate_fn
+from deep_miml.models import Attention, Average
 from deep_miml.utils import (
-    precision_recall_helper,
     get_avg_batch_precision_recall_at_k,
-    timing,
 )
+
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 
 # @timing
 def train_miml_model(
     model,
-    model_name, 
+    model_name,
     model_type,
     use_pretrained,
     device,
@@ -34,12 +32,12 @@ def train_miml_model(
     criterion,
     optimizer,
     save_folder,
-    lr = 0.001,
+    lr=0.001,
     num_epochs=25,
     early_stopping=True,
     patience=5,
 ):
-    best_model_wts = copy.deepcopy(model.state_dict())
+    # best_model_wts = copy.deepcopy(model.state_dict())
     best_avg_precision = 0.0
     val_apk_history = []
     val_ark_history = []
@@ -102,8 +100,8 @@ def train_miml_model(
                         if batch_iter_count % 1000 == 0:
                             print(
                                 f"\nRunning avg Loss at batch iter \
-                                                                {batch_iter_count} is \
-                                                                {np.mean(loss_list[-1000::])}"
+                                {batch_iter_count} is \
+                                {np.mean(loss_list[-1000::])}"
                             )
 
                 # statistics
@@ -139,17 +137,21 @@ def train_miml_model(
             print("{} Loss: {:.4f}".format(phase, epoch_loss))
             if phase == "train":
                 print(
-                    f"\nTrain -- epoch average precision at k = 1, 2, 3, 4, 5, 6: {epoch_apk}"
+                    f"\nTrain -- epoch average precision \
+                    at k = 1, 2, 3, 4, 5, 6: {epoch_apk}"
                 )
                 print(
-                    f"Train -- epoch average recall at k = 1, 2, 3, 4, 5, 6: {epoch_ark}\n"
+                    f"Train -- epoch average recall \
+                    at k = 1, 2, 3, 4, 5, 6: {epoch_ark}\n"
                 )
             else:
                 print(
-                    f"\nValidation -- epoch average precision at k = 1, 2, 3, 4, 5, 6: {epoch_apk}\n"
+                    f"\nValidation -- epoch average precision \
+                    at k = 1, 2, 3, 4, 5, 6: {epoch_apk}\n"
                 )
                 print(
-                    f"\nValidation -- epoch average recall at k = 1, 2, 3, 4, 5, 6: {epoch_ark}\n"
+                    f"\nValidation -- epoch average recall \
+                    at k = 1, 2, 3, 4, 5, 6: {epoch_ark}\n"
                 )
 
             # deep copy the model
@@ -324,7 +326,8 @@ if __name__ == "__main__":
     # Observe that all parameters are being optimized
     optimizer_ft = optim.Adam(model_ft.parameters(), lr=args.lr)
 
-    # You should pass logits to nn.BCEwithLogitsLoss and probabilities (using "sigmoid") to nn.BCELoss.
+    # You should pass logits to nn.BCEwithLogitsLoss
+    # and probabilities (using "sigmoid") to nn.BCELoss.
     # Using BCEWithLogitsLoss because it is more stable
     criterion = torch.nn.BCEWithLogitsLoss(weight=None, reduction="mean")
 
