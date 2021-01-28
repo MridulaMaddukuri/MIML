@@ -1,22 +1,19 @@
+# https://lernapparat.de/debug-device-assert/
+import argparse
 import json
 import os
 
-import numpy as np
-
-# https://lernapparat.de/debug-device-assert/
-import argparse
 # import copy
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.optim as optim
 from tqdm import tqdm
 
 from deep_miml.cifar_bags import collate_fn
 from deep_miml.models import Attention, Average
-from deep_miml.utils import (
-    get_avg_batch_precision_recall_at_k,
-)
+from deep_miml.utils import get_avg_batch_precision_recall_at_k
 
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
