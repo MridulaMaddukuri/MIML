@@ -41,12 +41,12 @@ def train_miml_model(
     stop_train = False
     model = model.to(device)
     if isinstance(model.fc, list):
-        for l in model.fc:
+        for layer in model.fc:
             if device != "cpu":
-                l.cuda()
-        for l in model.attn_layers:
+                layer.cuda()
+        for layer in model.attn_layers:
             if device != "cpu":
-                l.cuda()
+                layer.cuda()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     epoch = 0
     print(device)

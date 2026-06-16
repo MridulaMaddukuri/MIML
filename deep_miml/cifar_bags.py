@@ -87,7 +87,7 @@ class MIMLBagsData(Dataset):
     ):
 
         self.imgs, self.labels = data
-        self.labels = [int(l) for l in self.labels]
+        self.labels = [int(label) for label in self.labels]
 
         self.m = m
         self.num_bag = num_bag

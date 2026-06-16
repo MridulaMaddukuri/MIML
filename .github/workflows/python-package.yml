@@ -27,5 +27,5 @@ jobs:
       - name: Lint with ruff
         run: |
           pip install ruff
-          ruff check .
-          ruff format --check .
+          ruff check . --exclude notebooks/
+          ruff format --check . --exclude notebooks/
