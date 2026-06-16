@@ -6,7 +6,6 @@ import torchvision.transforms as transforms
 from deep_miml.cifar_bags import MIMLBagsData, get_test_data, get_train_val_split_data
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(
         description="Create and Save Multi-Instance Multi-Label Dataset"
     )

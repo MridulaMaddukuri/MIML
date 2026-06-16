@@ -183,7 +183,6 @@ def test_multi_instance_model(model, device, dataloader):
     batch_apk_list = []
     batch_ark_list = []
     with torch.no_grad():
-
         for inputs, sizes, labels in tqdm(dataloader):
             inputs = inputs.to(device)
             sizes = sizes.to(device)
