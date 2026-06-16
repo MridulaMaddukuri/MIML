@@ -13,7 +13,10 @@ from tqdm import tqdm
 
 from deep_miml.cifar_bags import collate_fn
 from deep_miml.models import Attention, Average
-from deep_miml.utils import get_avg_batch_precision_recall_at_k
+from deep_miml.utils import (
+    get_avg_batch_precision_recall_at_k,
+    test_multi_instance_model,
+)
 
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
@@ -36,17 +39,12 @@ def train_miml_model(
 ):
     # best_model_wts = copy.deepcopy(model.state_dict())
     best_avg_precision = 0.0
+    best_model_path = None
+    early_stop_count = 0
     val_apk_history = []
     val_ark_history = []
     stop_train = False
     model = model.to(device)
-    if isinstance(model.fc, list):
-        for layer in model.fc:
-            if device != "cpu":
-                layer.cuda()
-        for layer in model.attn_layers:
-            if device != "cpu":
-                layer.cuda()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     epoch = 0
     print(device)
@@ -173,49 +171,11 @@ def train_miml_model(
 
         epoch += 1
 
-    # load best model weights
-    model = torch.load(best_model_path)
-    return model  # , val_acc_history
-
-
-def test_multi_instance_model(model, device, dataloader):
-    model.eval()
-    batch_apk_list = []
-    batch_ark_list = []
-    with torch.no_grad():
-        for inputs, sizes, labels in tqdm(dataloader):
-            inputs = inputs.to(device)
-            sizes = sizes.to(device)
-            labels = labels.to(device)
-
-            if inputs.shape[0] == 0:
-                # Checking batch_size >1
-                continue
-            category_type_logits = model(inputs, sizes)
-            batch_apk = [
-                get_avg_batch_precision_recall_at_k(
-                    labels.detach().cpu().tolist(),
-                    category_type_logits.detach().cpu().tolist(),
-                    k,
-                )[0]
-                for k in range(1, 7)
-            ]
-            batch_ark = [
-                get_avg_batch_precision_recall_at_k(
-                    labels.detach().cpu().tolist(),
-                    category_type_logits.detach().cpu().tolist(),
-                    k,
-                )[1]
-                for k in range(1, 7)
-            ]
-            batch_apk_list.append(batch_apk)
-            batch_ark_list.append(batch_ark)
-        test_apk = np.around(np.mean(batch_apk_list, axis=0), 3)
-        test_ark = np.around(np.mean(batch_ark_list, axis=0), 3)
-    results = {}
-    results["precision_at"] = {k + 1: v for k, v in dict(enumerate(test_apk)).items()}
-    results["recall_at"] = {k + 1: v for k, v in dict(enumerate(test_ark)).items()}
-    return results
+    if best_model_path is not None:
+        model = torch.load(best_model_path)
+    else:
+        print("Warning: no validation improvement occurred, returning last model state")
+    return model
 
 
 if __name__ == "__main__":
@@ -262,7 +222,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--use_pretrained", type=bool, required=True, help="True or False"
+        "--use_pretrained", action="store_true", help="use pretrained weights"
     )
 
     parser.add_argument(

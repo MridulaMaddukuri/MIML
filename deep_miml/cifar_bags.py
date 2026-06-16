@@ -1,4 +1,3 @@
-import os
 import random
 from collections import defaultdict
 
@@ -8,19 +7,6 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import datasets
 from tqdm import tqdm
-
-seed = 1
-torch.manual_seed(seed)
-np.random.seed(seed)
-torch.cuda.manual_seed(seed)
-random.seed(seed)
-
-print(os.getcwd())
-# os.setcwd
-
-# TODO: do transform for CIFAR : DONE
-# TODO: Fix seed/ reproducability issue
-# Change format of the label : from roof shit
 
 
 def get_train_val_split_data(
@@ -32,9 +18,7 @@ def get_train_val_split_data(
         trainset, batch_size=trainset.__len__(), num_workers=num_workers
     )
 
-    batch_data, batch_labels = iter(trainloader).next()
-
-    # for (batch_data, batch_labels) in trainloader:
+    batch_data, batch_labels = next(iter(trainloader))
     train_data, val_data, train_labels, val_labels = train_test_split(
         batch_data,
         batch_labels,
@@ -51,7 +35,7 @@ def get_test_data(root, transform=None, num_workers=4):
     testloader = DataLoader(
         testset, batch_size=testset.__len__(), num_workers=num_workers
     )
-    batch_data, batch_labels = iter(testloader).next()
+    batch_data, batch_labels = next(iter(testloader))
 
     return batch_data, batch_labels
 
@@ -76,13 +60,11 @@ def collate_fn(batch, input_size=32):
 class MIMLBagsData(Dataset):
     def __init__(
         self,
-        data,  # tuple
+        data,
         num_bag=250,
         seed=1,
-        # TODO SW: consider making m { 'cata' : 10, 'catb' : 4, ...}
-        m=4,  # Upper bound on number of instances per category per bag
-        category_list=None,  # len(category_list) is N
-        transform=None,
+        m=4,
+        category_list=None,
         num_workers=2,
     ):
 

@@ -1,45 +1,31 @@
-import argparse
 import subprocess
 
-parser = argparse.ArgumentParser(
-    description="Create and Save Multi-Instance Multi-Label Dataset"
-)
+MODEL_NAMES = ["resnet18", "resnet34", "resnet50"]
+MODEL_TYPES = ["attention", "avg"]
+DATA_PATH = "data/miml_data20000.pt"
+SAVE_FOLDER = "results/"
+BATCH_SIZE = 32
 
+if __name__ == "__main__":
+    for m_n in MODEL_NAMES:
+        for m_t in MODEL_TYPES:
+            print(f"Training {m_n} {m_t}")
 
-model_names = ["resnet18", "resnet34", "resnet50"]  # "alexnet",
-
-model_types = ["attention", "avg"]
-
-data_path = "data/miml_data20000.pt"
-
-save_folder = "results/"
-
-batch_size = 32
-
-
-result = {}
-
-
-for m_n in model_names:
-    for m_t in model_types:
-        print(f"Training {m_n} {m_t}")
-
-        subprocess.check_call(
-            [
-                "python",
-                "-m",
-                "deep_miml.train",
-                "--model_name",
-                m_n,
-                "--model_type",
-                m_t,
-                "--use_pretrained",
-                "True",
-                "--data_file_path",
-                data_path,
-                "--save_folder",
-                save_folder,
-                "--batch_size",
-                str(batch_size),
-            ]
-        )
+            subprocess.check_call(
+                [
+                    "python",
+                    "-m",
+                    "deep_miml.train",
+                    "--model_name",
+                    m_n,
+                    "--model_type",
+                    m_t,
+                    "--use_pretrained",
+                    "--data_file_path",
+                    DATA_PATH,
+                    "--save_folder",
+                    SAVE_FOLDER,
+                    "--batch_size",
+                    str(BATCH_SIZE),
+                ]
+            )
