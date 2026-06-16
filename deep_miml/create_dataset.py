@@ -79,37 +79,31 @@ if __name__ == "__main__":
     )
 
     image_datasets = {}
-    # image_datasets['train'] = MIMLBagsData(train_dat, # tuple
-    # 									 num_bag=args.num_bags_train,
-    # 									 seed=args.seed,
-    # 									 # TODO SW: consider making m { 'cata' : 10, 'catb' : 4, ...}
-    # 									 m=args.m, # Upper bound on number of instances per category per bag
-    # 									 category_list = None, # len(category_list) is N
-    # 									 transform=transform,
-    # 									 num_workers=args.cpu_workers)
+    image_datasets["train"] = MIMLBagsData(
+        train_dat,
+        num_bag=args.num_bags_train,
+        seed=args.seed,
+        m=args.m,
+        category_list=None,
+        num_workers=args.cpu_workers,
+    )
 
-    # image_datasets['val'] = MIMLBagsData(val_dat, # tuple
-    # 					num_bag=args.num_bags_val,
-    # 					seed=args.seed,
-    # 					 # TODO SW: consider making m { 'cata' : 10, 'catb' : 4, ...}
-    # 					m=args.m, # Upper bound on number of instances per category per bag
-    # 					category_list = None, # len(category_list) is N
-    # 					transform=transform,
-    # 					num_workers=args.cpu_workers)
+    image_datasets["val"] = MIMLBagsData(
+        val_dat,
+        num_bag=args.num_bags_val,
+        seed=args.seed,
+        m=args.m,
+        category_list=None,
+        num_workers=args.cpu_workers,
+    )
 
     image_datasets["test"] = MIMLBagsData(
-        test_dat,  # tuple
+        test_dat,
         num_bag=args.num_bags_test,
         seed=args.seed,
-        # TODO SW: consider making m { 'cata' : 10, 'catb' : 4, ...}
-        m=args.m,  # Upper bound on number of instances per category per bag
-        category_list=None,  # len(category_list) is N
-        transform=transform,
+        m=args.m,
+        category_list=None,
         num_workers=args.cpu_workers,
     )
 
     torch.save(image_datasets, args.save_file_to)
-
-    # with open('../data/mimil_dataset.pkl', 'wb') as pickle_file:
-    #    # cPickle.dump(all, pickle_file)
-    # 	pickle.dump(obj=image_datasets, file=pickle_file)
