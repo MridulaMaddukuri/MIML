@@ -21,9 +21,7 @@ result = {}
 
 
 for m_n in model_names:
-
     for m_t in model_types:
-
         print(f"Training {m_n} {m_t}")
 
         subprocess.check_call(

@@ -158,7 +158,6 @@ class Attention(nn.Module):
         self.fc = []
 
         for i in range(self.num_classes):
-
             self.attn_layers.append(
                 nn.Sequential(
                     nn.Linear(num_ftrs, self.D), nn.Tanh(), nn.Linear(self.D, self.K)
@@ -196,7 +195,6 @@ class Attention(nn.Module):
         M = []
         h = h.view(h.size(0), h.size(1))
         for i in range(self.num_classes):
-
             a = self.attn_layers[i](h)  # NxK
             a = torch.transpose(a, 1, 0)  # KxN
             a = F.softmax(a, dim=1)  # softmax over N
